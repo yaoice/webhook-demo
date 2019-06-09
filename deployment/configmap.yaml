@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: admission-webhook-example-configmap
+data:
+  sidecarconfig.yaml: |
+    containers:
+      - name: sidecar-nginx
+        image: nginx
+        imagePullPolicy: IfNotPresent
+        ports:
+          - containerPort: 80
+        volumeMounts:
+          - name: nginx-conf
+            mountPath: /etc/nginx
+    volumes:
+      - name: nginx-conf
+        configMap:
+          name: nginx-configmap

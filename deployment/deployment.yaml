@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: admission-webhook-example-deployment
+  labels:
+    app: admission-webhook-example
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: admission-webhook-example
+  template:
+    metadata:
+      labels:
+        app: admission-webhook-example
+    spec:
+      containers:
+        - name: admission-webhook-example
+          image: test/admission-webhook-example:v1
+          imagePullPolicy: Always
+          args:
+            - -tlsCertPath=/etc/webhook/certs/cert.pem
+            - -tlsKeyPath=/etc/webhook/certs/key.pem
+            - -sidecarCfgFile=/etc/webhook/config/sidecarconfig.yaml
+            - -alsologtostderr
+            - -v=4
+            - 2>&1
+          volumeMounts:
+            - name: webhook-certs
+              mountPath: /etc/webhook/certs
+              readOnly: true
+            - name: webhook-config
+              mountPath: /etc/webhook/config
+      volumes:
+        - name: webhook-certs
+          secret:
+            secretName: admission-webhook-example-certs
+        - name: webhook-config
+          configMap:
+            name: admission-webhook-example-configmap
+

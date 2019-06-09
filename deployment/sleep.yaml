@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sleep
+  labels:
+    app: sleep1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sleep
+  template:
+    metadata:
+      labels:
+        app: sleep
+    spec:
+      containers:
+      - name: sleep
+        image: busybox
+        command: ["sleep", "3600"]
+        imagePullPolicy: IfNotPresent
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sleep 
+  labels:
+    app: sleep 
+spec:
+  ports:
+  - port: 80 
+    targetPort: 80 
+  selector:
+    app: sleep 
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: sleep 
+spec:
+  rules:
+  - host: xx.sleep.com 
+    http:
+      paths:
+      - backend:
+          serviceName: sleep 
+          servicePort: 80
+        path: /
